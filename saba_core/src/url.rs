@@ -20,3 +20,9 @@ impl Url {
         }
     }
 }
+
+impl Url {
+    pub fn parse(&mut self) -> Result<Self, String> {
+        unimplemented!()
+    }
+}
