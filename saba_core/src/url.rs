@@ -1,6 +1,8 @@
 use alloc::string::{String, ToString};
 use alloc::vec::Vec;
 
+const HTTP_ONLY_MESSAGE: &str = "Only HTTP scheme is supported";
+
 #[derive(Debug, Clone, PartialEq)]
 pub struct Url {
     url: String,
@@ -23,7 +25,7 @@ impl Url {
 
     pub fn parse(&mut self) -> Result<Self, String> {
         if !self.is_http() {
-            return Err("Only HTTP scheme is supported".to_string());
+            return Err(HTTP_ONLY_MESSAGE.to_string());
         }
         self.host = self.extract_host();
         self.port = self.extract_port();
@@ -56,12 +58,15 @@ impl Url {
         false
     }
 
-    fn extract_host(&self) -> String {
-        let url_parts: Vec<&str> = self
-            .url
+    fn extract_url_parts(&self) -> Vec<&str> {
+        self.url
             .trim_start_matches("http://")
             .splitn(2, '/')
-            .collect();
+            .collect()
+    }
+
+    fn extract_host(&self) -> String {
+        let url_parts = self.extract_url_parts();
 
         if let Some(index) = url_parts[0].find(':') {
             url_parts[0][..index].to_string()
@@ -71,11 +76,7 @@ impl Url {
     }
 
     fn extract_port(&self) -> String {
-        let url_parts: Vec<&str> = self
-            .url
-            .trim_start_matches("http://")
-            .splitn(2, '/')
-            .collect();
+        let url_parts = self.extract_url_parts();
 
         if let Some(index) = url_parts[0].find(':') {
             url_parts[0][index + 1..].to_string()
@@ -85,11 +86,7 @@ impl Url {
     }
 
     fn extract_path(&self) -> String {
-        let url_parts: Vec<&str> = self
-            .url
-            .trim_start_matches("http://")
-            .splitn(2, '/')
-            .collect();
+        let url_parts = self.extract_url_parts();
 
         if url_parts.len() < 2 {
             return "".to_string();
@@ -100,11 +97,7 @@ impl Url {
     }
 
     fn extract_searchpart(&self) -> String {
-        let url_parts: Vec<&str> = self
-            .url
-            .trim_start_matches("http://")
-            .splitn(2, '/')
-            .collect();
+        let url_parts = self.extract_url_parts();
 
         if url_parts.len() < 2 {
             return "".to_string();
@@ -192,7 +185,7 @@ mod tests {
     #[test]
     fn test_no_schema() {
         let url = "example.com".to_string();
-        let expected = Err("Only HTTP scheme is supported".to_string());
+        let expected = Err(HTTP_ONLY_MESSAGE.to_string());
         assert_eq!(expected, Url::new(url).parse());
     }
 
