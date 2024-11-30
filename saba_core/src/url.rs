@@ -23,18 +23,6 @@ impl Url {
         }
     }
 
-    pub fn parse(&mut self) -> Result<Self, String> {
-        if !self.is_http() {
-            return Err(HTTP_ONLY_MESSAGE.to_string());
-        }
-        self.host = self.extract_host();
-        self.port = self.extract_port();
-        self.path = self.extract_path();
-        self.searchpart = self.extract_searchpart();
-
-        Ok(self.clone())
-    }
-
     pub fn host(&self) -> String {
         self.host.clone()
     }
@@ -51,6 +39,20 @@ impl Url {
         self.searchpart.clone()
     }
 
+    // URLからURえるからホスト、ポート、パス、クエリパラメータを抽出する
+    pub fn parse(&mut self) -> Result<Self, String> {
+        if !self.is_http() {
+            return Err(HTTP_ONLY_MESSAGE.to_string());
+        }
+        self.host = self.extract_host();
+        self.port = self.extract_port();
+        self.path = self.extract_path();
+        self.searchpart = self.extract_searchpart();
+
+        Ok(self.clone())
+    }
+
+    // httpスキームかどうかを判定する
     fn is_http(&mut self) -> bool {
         if self.url.contains("http://") {
             return true;
@@ -58,6 +60,7 @@ impl Url {
         false
     }
 
+    // URLをパーツに分割する
     fn extract_url_parts(&self) -> Vec<&str> {
         self.url
             .trim_start_matches("http://")
@@ -65,6 +68,7 @@ impl Url {
             .collect()
     }
 
+    // ホストを抽出する
     fn extract_host(&self) -> String {
         let url_parts = self.extract_url_parts();
 
@@ -75,6 +79,7 @@ impl Url {
         }
     }
 
+    // ポートを抽出する
     fn extract_port(&self) -> String {
         let url_parts = self.extract_url_parts();
 
@@ -85,6 +90,7 @@ impl Url {
         }
     }
 
+    // パスを抽出する
     fn extract_path(&self) -> String {
         let url_parts = self.extract_url_parts();
 
@@ -96,6 +102,7 @@ impl Url {
         path_and_searchpart[0].to_string()
     }
 
+    // クエリパラメータを抽出する
     fn extract_searchpart(&self) -> String {
         let url_parts = self.extract_url_parts();
 
