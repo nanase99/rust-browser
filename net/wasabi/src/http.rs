@@ -45,7 +45,7 @@ impl HttpClient {
         // リクエストラインの構築
         let mut request = String::from("GET /");
         request.push_str(&path);
-        request.push_str("HTTP/1.1\n");
+        request.push_str(" HTTP/1.1\n");
 
         // ヘッダの追加
         request.push_str("Host: ");
