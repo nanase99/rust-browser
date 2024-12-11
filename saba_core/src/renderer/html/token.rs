@@ -71,6 +71,17 @@ pub struct HtmlTokenizer {
 }
 
 impl HtmlTokenizer {
+    pub fn new(html: String) -> Self {
+        Self {
+            state: State::Data,
+            pos: 0,
+            reconsume: false,
+            latest_token: None,
+            input: html.chars().collect(),
+            buf: String::new(),
+        }
+    }
+
     fn is_eof(&self) -> bool {
         self.pos > self.input.len()
     }
@@ -497,5 +508,18 @@ impl Iterator for HtmlTokenizer {
                 }
             }
         }
+    }
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+    use crate::alloc::string::ToString;
+
+    #[test]
+    fn test_empty() {
+        let html = "".to_string();
+        let mut tokenizer = HtmlTokenizer::new(html);
+        assert!(tokenizer.next().is_none());
     }
 }
