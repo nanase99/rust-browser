@@ -303,7 +303,10 @@ impl Iterator for HtmlTokenizer {
 
                     if c.is_ascii_uppercase() {
                         self.append_attribute(c.to_ascii_lowercase(), true);
+                        continue;
                     }
+
+                    self.append_attribute(c, true);
                 }
 
                 State::AfterAttributeName => {
@@ -515,11 +518,72 @@ impl Iterator for HtmlTokenizer {
 mod tests {
     use super::*;
     use crate::alloc::string::ToString;
+    use alloc::vec;
 
     #[test]
     fn test_empty() {
         let html = "".to_string();
         let mut tokenizer = HtmlTokenizer::new(html);
         assert!(tokenizer.next().is_none());
+    }
+
+    #[test]
+    fn test_start_and_end_tag() {
+        let html = "<body></body>".to_string();
+        let mut tokenizer = HtmlTokenizer::new(html);
+        let expected = [
+            HtmlToken::StartTag {
+                tag: "body".to_string(),
+                self_closing: false,
+                attributes: Vec::new(),
+            },
+            HtmlToken::EndTag {
+                tag: "body".to_string(),
+            },
+        ];
+        for e in expected {
+            assert_eq!(Some(e), tokenizer.next());
+        }
+    }
+
+    #[test]
+    fn test_attributes() {
+        let html = "<p class=\"A\" id='B' foo=bar></p>".to_string();
+        let mut tokenizer = HtmlTokenizer::new(html);
+        let mut attr1 = Attribute::new();
+        attr1.add_char('c', true);
+        attr1.add_char('l', true);
+        attr1.add_char('a', true);
+        attr1.add_char('s', true);
+        attr1.add_char('s', true);
+        attr1.add_char('A', false);
+
+        let mut attr2 = Attribute::new();
+        attr2.add_char('i', true);
+        attr2.add_char('d', true);
+        attr2.add_char('B', false);
+
+        let mut attr3 = Attribute::new();
+        attr3.add_char('f', true);
+        attr3.add_char('o', true);
+        attr3.add_char('o', true);
+        attr3.add_char('b', false);
+        attr3.add_char('a', false);
+        attr3.add_char('r', false);
+
+        let expected = [
+            HtmlToken::StartTag {
+                tag: "p".to_string(),
+                self_closing: false,
+                attributes: vec![attr1, attr2, attr3],
+            },
+            HtmlToken::EndTag {
+                tag: "p".to_string(),
+            },
+        ];
+
+        for e in expected {
+            assert_eq!(Some(e), tokenizer.next());
+        }
     }
 }
