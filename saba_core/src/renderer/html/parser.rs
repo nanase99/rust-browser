@@ -126,6 +126,30 @@ impl HtmlParser {
                     self.mode = InsertionMode::BeforeHead;
                     continue;
                 }
+                InsertionMode::BeforeHead => match token {
+                    Some(HtmlToken::Char(c)) => {
+                        if c == ' ' || c == '\n' {
+                            token = self.t.next();
+                            continue;
+                        }
+                    }
+                    Some(HtmlToken::StartTag {
+                        ref tag,
+                        self_closing: _,
+                        ref attributes,
+                    }) => {
+                        if tag == "head" {
+                            self.insert_element(tag, attributes.to_vec());
+                            self.mode = InsertionMode::InHead;
+                            token = self.t.next();
+                            continue;
+                        }
+                    }
+                    Some(HtmlToken::Eof) | None => {
+                        return self.window.clone();
+                    }
+                    _ => {}
+                },
                 _ => {}
             }
         }
