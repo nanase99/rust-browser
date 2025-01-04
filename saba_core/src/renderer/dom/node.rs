@@ -169,6 +169,13 @@ impl Element {
     pub fn kind(&self) -> ElementKind {
         self.kind
     }
+
+    pub fn is_block_element(&self) -> bool {
+        match self.kind {
+            ElementKind::Body | ElementKind::H1 | ElementKind::H2 | ElementKind::P => true,
+            _ => false,
+        }
+    }
 }
 
 /// https://dom.spec.whatwg.org/#interface-element
@@ -203,7 +210,7 @@ impl Display for ElementKind {
             ElementKind::Body => "body",
             ElementKind::H1 => "h1",
             ElementKind::H2 => "h2",
-            ElementKind::p => "p",
+            ElementKind::P => "p",
             ElementKind::A => "a",
         };
         write!(f, "{}", s)
