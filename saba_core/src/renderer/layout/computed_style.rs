@@ -47,6 +47,10 @@ impl ComputedStyle {
             .expect("failed to access CSS property: color")
     }
 
+    pub fn set_color(&mut self, color: Color) {
+        self.color = Some(color);
+    }
+
     pub fn display(&self) -> DisplayType {
         self.display
             .expect("failed to access CSS property: display")
