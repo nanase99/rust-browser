@@ -101,7 +101,7 @@ impl LayoutObject {
             match declaration.property.as_str() {
                 "background-color" => {
                     if let ComponentValue::Ident(value) = &declaration.value {
-                        let color = match Color::from_name(&value) {
+                        let color = match Color::from_name(value) {
                             Ok(color) => color,
                             Err(_) => Color::white(),
                         };
@@ -109,7 +109,7 @@ impl LayoutObject {
                         continue;
                     }
                     if let ComponentValue::HashToken(color_code) = &declaration.value {
-                        let color = match Color::from_code(&color_code) {
+                        let color = match Color::from_code(color_code) {
                             Ok(color) => color,
                             Err(_) => Color::white(),
                         };
@@ -119,7 +119,7 @@ impl LayoutObject {
                 }
                 "color" => {
                     if let ComponentValue::Ident(value) = &declaration.value {
-                        let color = match Color::from_name(&value) {
+                        let color = match Color::from_name(value) {
                             Ok(color) => color,
                             Err(_) => Color::black(),
                         };
